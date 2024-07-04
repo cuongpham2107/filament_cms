@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('data_models', function (Blueprint $table) {
+        Schema::create('pivot_category_product', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->text('schema');
-            $table->text('relations')->nullable();
-            $table->string('trait_ralation_path')->nullable();
-            $table->timestamps();
+            $table->integer('category_id');
+            $table->integer('product_id');
+            $table->timestamp('created_at');
+            $table->timestamp('updated_at');
         });
     }
 
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('data_models');
+        Schema::dropIfExists('pivot_category_product');
     }
 };
