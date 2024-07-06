@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Database\DatabaseManager;
 use App\Filament\Resources\DataModelResource\Pages;
 use App\Models\DataModel;
 use App\Tables\Columns\TableRepeaterColumn;
@@ -15,6 +16,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\ActionSize;
@@ -48,12 +50,13 @@ class DataModelResource extends Resource
                         TableRepeater::make('schema')
                             ->default([
                                 [
+                                    'id' => Str::uuid()->toString(),
                                     'name' => 'id',
                                     'type' => 'integer',
                                     'length' => 11,
-                                    'is_nullable' => true,
-                                    'is_unsigned' => true,
-                                    'is_auto_increment' => true,
+                                    'notnull' => true,
+                                    'unsigned' => true,
+                                    'autoincrement' => true,
                                     'index' => 'primary',
                                     'default' => null,
                                 ],
@@ -62,6 +65,7 @@ class DataModelResource extends Resource
                             ->addActionLabel('Add New Column')
                             ->cloneable()
                             ->headers([
+                                Header::make('id')->width('50px'),
                                 Header::make('name')->width('150px'),
                                 Header::make('type')->width('150px'),
                                 Header::make('length')->width('150px'),
@@ -78,6 +82,8 @@ class DataModelResource extends Resource
                                 Header::make('default')->width('150px'),
                             ])
                             ->schema([
+                                TextInput::make('id')
+                                    ->default(Str::uuid()->toString()),
                                 TextInput::make('name')
                                     ->placeholder('Name')
                                     ->required(),
@@ -139,11 +145,11 @@ class DataModelResource extends Resource
                                 TextInput::make('length')
                                     ->default(null)
                                     ->numeric(),
-                                Checkbox::make('is_nullable')
+                                Checkbox::make('notnull')
                                     ->default(false),
-                                Checkbox::make('is_unsigned')
+                                Checkbox::make('unsigned')
                                     ->default(false),
-                                Checkbox::make('is_auto_increment')
+                                Checkbox::make('autoincrement')
                                     ->default(false),
                                 Select::make('index')
                                     ->placeholder('Choose')
@@ -169,12 +175,13 @@ class DataModelResource extends Resource
                                         ];
                                         foreach ($name as $item) {
                                             $state[Str::uuid()->toString()] = [
+                                                'id' => Str::uuid()->toString(),
                                                 'name' => $item,
                                                 'type' => 'timestamp',
                                                 'length' => null,
-                                                'is_nullable' => false,
-                                                'is_unsigned' => false,
-                                                'is_auto_increment' => false,
+                                                'notnull' => false,
+                                                'unsigned' => false,
+                                                'autoincrement' => false,
                                                 'index' => 'none',
                                                 'default' => null,
                                             ];
@@ -191,12 +198,13 @@ class DataModelResource extends Resource
                                         ];
                                         foreach ($name as $item) {
                                             $state[Str::uuid()->toString()] = [
+                                                'id' => Str::uuid()->toString(),
                                                 'name' => $item,
                                                 'type' => 'timestamp',
                                                 'length' => null,
-                                                'is_nullable' => true,
-                                                'is_unsigned' => false,
-                                                'is_auto_increment' => false,
+                                                'notnull' => true,
+                                                'unsigned' => false,
+                                                'autoincrement' => false,
                                                 'index' => 'none',
                                                 'default' => null,
                                             ];
@@ -205,6 +213,7 @@ class DataModelResource extends Resource
                                         $component->state($state);
                                     }),
                             ])
+                           
                             ->columnSpan('full'),
 
                     ])->columns(3),
@@ -236,7 +245,24 @@ class DataModelResource extends Resource
             ->actions([
                 ActionGroup::make([
                     Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->before(function (DataModel $record) {
+                            $databaseManager = DatabaseManager::getInstance();
+                            $result = $databaseManager->deleteTable($record->name);
+                            if ($result) {
+                                Notification::make()
+                                    ->title('Table deleted successfully')
+                                    ->success()
+                                    ->body($result['message'])
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->title('Table deleted failed')
+                                    ->error()
+                                    ->body($result['message'])
+                                    ->send();
+                            }
+                        }),
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\ReplicateAction::make(),
                     Tables\Actions\Action::make('relations')
@@ -337,7 +363,24 @@ class DataModelResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->before(function (DataModel $record) {
+                            $databaseManager = DatabaseManager::getInstance();
+                            $result = $databaseManager->deleteTable($record->name);
+                            if ($result) {
+                                Notification::make()
+                                    ->title('Table deleted successfully')
+                                    ->success()
+                                    ->body($result['message'])
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->title('Table deleted failed')
+                                    ->error()
+                                    ->body($result['message'])
+                                    ->send();
+                            }
+                        }),
                 ]),
             ]);
     }

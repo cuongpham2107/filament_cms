@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\DataModelResource\Pages;
 
+use App\Database\DatabaseManager;
 use App\Filament\Resources\DataModelResource;
 use Filament\Actions;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
@@ -15,7 +17,7 @@ class ListDataModels extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
         ];
     }
 }
