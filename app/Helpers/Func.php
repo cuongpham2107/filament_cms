@@ -1,9 +1,5 @@
 <?php
-
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Schema;
 
 if (!function_exists('formatRelationshipMethod')) {
     function formatRelationshipMethod($method)
@@ -89,6 +85,250 @@ if(!function_exists('create_trait_relations')){
         }
         file_put_contents($traitPath, $traitContent);
         
+    }
+}
+if(!function_exists('craete_resource'))
+{
+    function craete_resource($data,$record){
+
+        $resource = "<?php\n\n";
+        $resource .= "namespace App\Filament\Resources;\n";
+        $resource .= "use App\Filament\Resources\\".singularize_and_capitalize_words($record->name)."Resource\Pages;\n";
+        $resource .= "use App\Filament\Resources\\".singularize_and_capitalize_words($record->name)."Resource\RelationManagers;\n";
+        $resource .= "use App\Models\\".singularize_and_capitalize_words($record->name).";\n";
+        $resource .= "use Filament\Forms\Form;\n";
+        $resource .= "use Filament\Resources\Resource;\n";
+        $resource .= "use Filament\Tables;\n";
+        $resource .= "use Filament\Tables\Table;\n";
+        $resource .= "use Filament\Forms\Components\TextInput;\n";
+        $resource .= "use Filament\Forms\Components\Select;\n";
+        $resource .= "use Filament\Forms\Components\Checkbox;\n";
+        $resource .= "use Filament\Forms\Components\Toggle;\n";
+        $resource .= "use Filament\Forms\Components\CheckboxList;\n";
+        $resource .= "use Filament\Forms\Components\Radio;\n";
+        $resource .= "use Filament\Forms\Components\DatePicker;\n";
+        $resource .= "use Filament\Forms\Components\DateTimePicker;\n";
+        $resource .= "use Filament\Forms\Components\TimePicker;\n";
+        $resource .= "use Filament\Forms\Components\FileUpload;\n";
+        $resource .= "use Filament\Forms\Components\RichEditor;\n";
+        $resource .= "use Filament\Forms\Components\MarkdownEditor;\n";
+        $resource .= "use Filament\Forms\Components\Repeater;\n";
+        $resource .= "use Filament\Forms\Components\Builder;\n";
+        $resource .= "use Filament\Forms\Components\TagsInput;\n";
+        $resource .= "use Filament\Forms\Components\Textarea;\n";
+        $resource .= "use Filament\Forms\Components\KeyValue;\n";
+        $resource .= "use Filament\Forms\Components\ColorPicker;\n";
+        $resource .= "use Filament\Forms\Components\ToggleButtons;\n";
+        $resource .= "use Filament\Forms\Components\Hidden;\n";
+        $resource .= "use Filament\Forms\Components\Section;\n";
+
+        $resource .= "class ".singularize_and_capitalize_words($record->name)."Resource extends Resource\n";
+        $resource .= "{\n";
+
+        $resource .= "    protected static ?string \$model = ".singularize_and_capitalize_words($record->name)."::class;\n";
+        $resource .= "    protected static ?string \$navigationIcon = 'heroicon-o-rectangle-stack';\n";
+        $resource .= "    public static function form(Form \$form): Form\n";
+        $resource .= "    {\n";
+        $resource .= "        return \$form\n";
+        $resource .= "            ->schema([\n";
+        $resource .= "                  Section::make('".singularize_and_capitalize_words($record->name)." Information')\n";
+        $resource .= "                      ->schema([\n";
+        
+        foreach ($data['resource'] as $field) {
+            switch ($field['options']) {
+                case 'text':
+                    $resource .= "                TextInput::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'select':
+                    $resource .= "                Select::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'checkbox':
+                    $resource .= "                Checkbox::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'toggle':
+                    $resource .= "                Toggle::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'checkbox_list':
+                    $resource .= "                CheckboxList::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'radio':
+                    $resource .= "                Radio::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'date':
+                    $resource .= "                DatePicker::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'datetime':
+                    $resource .= "                DateTimePicker::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'time':
+                    $resource .= "                TimePicker::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'file':
+                    $resource .= "                FileUpload::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'rich_text':
+                    $resource .= "                RichEditor::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'markerdown_editor':
+                    $resource .= "                MarkdownEditor::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'repeater':
+                    $resource .= "                Repeater::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'builder':
+                    $resource .= "                Builder::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'tags_input':
+                    $resource .= "                TagsInput::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'textarea':
+                    $resource .= "                Textarea::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'key_value':
+                    $resource .= "                KeyValue::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'color_picker':
+                    $resource .= "                ColorPicker::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'toggle_button':
+                    $resource .= "                ToggleButtons::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'hidden':
+                    $resource .= "                Hidden::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                default:
+                    $resource .= "                TextInput::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+            }
+        }
+        $resource .= "                      ])->columns(12),\n";
+        $resource .= "            ]);\n";
+        $resource .= "    }\n";
+        $resource .= "    public static function table(Table \$table): Table\n";
+        $resource .= "    {\n";
+        $resource .= "        return \$table\n";
+        $resource .= "            ->columns([\n";
+        $resource .= "                \n";
+        $resource .= "            ])\n";
+        $resource .= "            ->filters([\n";
+        $resource .= "                \n";
+        $resource .= "            ])\n";
+        $resource .= "            ->actions([\n";
+        $resource .= "                Tables\Actions\EditAction::make(),\n";
+        $resource .= "            ])\n";
+        $resource .= "            ->bulkActions([\n";
+        $resource .= "                Tables\Actions\BulkActionGroup::make([\n";
+        $resource .= "                    Tables\Actions\DeleteBulkAction::make(),\n";
+        $resource .= "                ]),\n";
+        $resource .= "            ]);\n";
+        $resource .= "    }\n";
+        $resource .= "    public static function getRelations(): array\n";
+        $resource .= "    {\n";
+        $resource .= "        return [\n";
+        $resource .= "            //\n";
+        $resource .= "        ];\n";
+        $resource .= "    }\n";
+        $resource .= "    public static function getPages(): array\n";
+        $resource .= "    {\n";
+        $resource .= "        return [\n";
+        $resource .= "            'index' => Pages\List".singularize_and_capitalize_words($record->name)."::route('/'),\n";
+        $resource .= "            'create' => Pages\Create".singularize_and_capitalize_words($record->name)."::route('/create'),\n";
+        $resource .= "            'edit' => Pages\Edit".singularize_and_capitalize_words($record->name)."::route('/{record}/edit'),\n";
+        $resource .= "        ];\n";
+        $resource .= "    }\n";
+        $resource .= "}\n";
+        $resourceContent =  $resource;
+        $directory = app_path('Filament/Resources');
+        if (!File::isDirectory($directory)) {
+            File::makeDirectory($directory, 0755, true);
+        }
+        $resourcePath = app_path('Filament/Resources/' . singularize_and_capitalize_words($record->name) . 'Resource.php');
+        if(file_exists($resourcePath)){
+            unlink($resourcePath);
+        }
+        file_put_contents($resourcePath, $resourceContent);
+
+        create_page($record);
+        edit_page($record);
+        list_page($record);
+    }
+    function create_page($record){
+        $page = "<?php\n\n";
+        $page .= "namespace App\Filament\Resources\\".singularize_and_capitalize_words($record->name)."Resource\Pages;\n";
+        $page .= "use App\Filament\Resources\\".singularize_and_capitalize_words($record->name)."Resource;\n";
+        $page .= "use Filament\Actions;\n";
+        $page .= "use Filament\Resources\Pages\CreateRecord;\n";
+        $page .= "class Create".singularize_and_capitalize_words($record->name)." extends CreateRecord\n";
+        $page .= "{\n";
+        $page .= "    protected static string \$resource = ".singularize_and_capitalize_words($record->name)."Resource::class;\n";
+        $page .= " }\n";
+        $pageContent =  $page;
+        $directory = app_path('Filament/Resources/'.singularize_and_capitalize_words($record->name).'Resource/Pages');
+        if (!File::isDirectory($directory)) {
+            File::makeDirectory($directory, 0755, true);
+        }
+        $pagePath = app_path('Filament/Resources/'.singularize_and_capitalize_words($record->name).'Resource/Pages/Create'.singularize_and_capitalize_words($record->name).'.php');
+        if(file_exists($pagePath)){
+            unlink($pagePath);
+        }
+        file_put_contents($pagePath, $pageContent);
+        
+    }
+    function edit_page($record){
+        $page = "<?php\n\n";
+        $page .= "namespace App\Filament\Resources\\".singularize_and_capitalize_words($record->name)."Resource\Pages;\n";
+        $page .= "use App\Filament\Resources\\".singularize_and_capitalize_words($record->name)."Resource;\n";
+        $page .= "use Filament\Actions;\n";
+        $page .= "use Filament\Resources\Pages\EditRecord;\n";
+        $page .= "use App\Common\CompareArrayCommon;\n";
+        $page .= "class Edit".singularize_and_capitalize_words($record->name)." extends EditRecord\n";
+        $page .= "{\n";
+        $page .= "    protected static string \$resource = ".singularize_and_capitalize_words($record->name)."Resource::class;\n";
+        $page .= "    protected function getHeaderActions(): array\n";
+        $page .= "    {\n";
+        $page .= "        return [\n";
+        $page .= "            Actions\DeleteAction::make()\n";
+        $page .= "        ];\n";
+        $page .= "    }\n";
+        $page .= "}";
+
+        $pageContent =  $page;
+        $directory = app_path('Filament/Resources/'.singularize_and_capitalize_words($record->name).'Resource/Pages');
+        if (!File::isDirectory($directory)) {
+            File::makeDirectory($directory, 0755, true);
+        }
+        $pagePath = app_path('Filament/Resources/'.singularize_and_capitalize_words($record->name).'Resource/Pages/Edit'.singularize_and_capitalize_words($record->name).'.php');
+        if(file_exists($pagePath)){
+            unlink($pagePath);
+        }
+        file_put_contents($pagePath, $pageContent);
+    }
+    function list_page($record){
+        $page = "<?php\n\n";
+        $page .= "namespace App\Filament\Resources\\".singularize_and_capitalize_words($record->name)."Resource\Pages;\n";
+        $page .= "use App\Filament\Resources\\".singularize_and_capitalize_words($record->name)."Resource;\n";
+        $page .= "use Filament\Actions;\n";
+        $page .= "use Filament\Resources\Pages\ListRecords;\n";
+        $page .= "class List".singularize_and_capitalize_words($record->name)." extends ListRecords\n";
+        $page .= "{\n";
+        $page .= "    protected static string \$resource = ".singularize_and_capitalize_words($record->name)."Resource::class;\n";
+        $page .= "    protected function getHeaderActions(): array\n";
+        $page .= "    {\n";
+        $page .= "        return [\n";
+        $page .= "            Actions\CreateAction::make(),\n";
+        $page .= "        ];\n";
+        $page .= "    }\n";
+        $page .= "}\n";
+        $pageContent =  $page;
+        $directory = app_path('Filament/Resources/'.singularize_and_capitalize_words($record->name).'Resource/Pages');
+        if (!File::isDirectory($directory)) {
+            File::makeDirectory($directory, 0755, true);
+        }
+        $pagePath = app_path('Filament/Resources/'.singularize_and_capitalize_words($record->name).'Resource/Pages/List'.singularize_and_capitalize_words($record->name).'.php');
+        if(file_exists($pagePath)){
+            unlink($pagePath);
+        }
+        file_put_contents($pagePath, $pageContent);
     }
 }
 

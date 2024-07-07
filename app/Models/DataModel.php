@@ -25,6 +25,7 @@ class DataModel extends Model
         return [
             'schema' => 'array',
             'relations' => 'array',
+            'resource' => 'array',
         ];
     }
 }

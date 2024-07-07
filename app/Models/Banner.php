@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-use App\Models\Traits\SadasdRelationTrait;
+use App\Models\Traits\BannerRelationTrait;
 
-class Sadasd extends Model
+class Banner extends Model
 {
-    use HasFactory,SadasdRelationTrait;
+    use HasFactory,BannerRelationTrait;
 
      /**
      * The attributes that are mass assignable.

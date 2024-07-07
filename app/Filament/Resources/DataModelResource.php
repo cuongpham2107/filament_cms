@@ -10,6 +10,7 @@ use Awcodes\TableRepeater\Components\TableRepeater;
 use Awcodes\TableRepeater\Header;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -25,6 +26,7 @@ use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
+use Wiebenieuwenhuis\FilamentCodeEditor\Components\CodeEditor;
 
 class DataModelResource extends Resource
 {
@@ -65,24 +67,23 @@ class DataModelResource extends Resource
                             ->addActionLabel('Add New Column')
                             ->cloneable()
                             ->headers([
-                                Header::make('id')->width('50px'),
                                 Header::make('name')->width('150px'),
                                 Header::make('type')->width('150px'),
-                                Header::make('length')->width('150px'),
+                                Header::make('length')->width('100px'),
                                 Header::make('is_nullable')
                                     ->label('Not Null')
-                                    ->width('50px'),
+                                    ->width('70px'),
                                 Header::make('is_unsigned')
                                     ->label('Unsigned')
                                     ->width('50px'),
                                 Header::make('is_auto_increment')
                                     ->label('Auto Increment')
-                                    ->width('50px'),
-                                Header::make('index')->width('150px'),
+                                    ->width('70px'),
+                                Header::make('index')->width('100px'),
                                 Header::make('default')->width('150px'),
                             ])
                             ->schema([
-                                TextInput::make('id')
+                                Hidden::make('id')
                                     ->default(Str::uuid()->toString()),
                                 TextInput::make('name')
                                     ->placeholder('Name')
@@ -272,6 +273,7 @@ class DataModelResource extends Resource
                     ->icon('heroicon-m-paper-clip')
                     ->modalWidth(MaxWidth::ScreenTwoExtraLarge)
                     ->fillForm(fn (DataModel $record): array => [
+                       
                         'relations' => $record->relations,
                     ])
                     ->form([
@@ -350,10 +352,105 @@ class DataModelResource extends Resource
                             ])
                     ])
                     ->action(function (array $data, DataModel $record): void {
-                        create_trait_relations( $data,$record);
+                        create_trait_relations($data,$record);
                         $record->relations = $data['relations'];
                         $record->save();
                     }),
+                    Tables\Actions\Action::make('resource')
+                        ->label(function (DataModel $record) {
+                            return "Create Resource ($record->name)";
+                        })
+                        ->icon('heroicon-m-adjustments-horizontal')
+                        ->fillForm(function (DataModel $record): array {
+                            $resource = [];
+                            $schema = $record->schema;
+                            foreach ($schema as $item) {
+                                if($item['name'] !== 'id'){
+                                    $resource[] = [
+                                        'name' => $item['name'],
+                                        'options' => 'none',
+                                        'column' => 1,
+                                    ];
+                                }
+                            }
+                                        
+                            return [
+                                'resource' => $record->resource ?? $resource,
+                            ];
+                        })
+                        ->form([
+                            Section::make('Make Resource')
+                            ->description('Create a new resource file for the model. The resource file will be created in the app/Filament/Resources directory.')
+                            
+                            ->schema([
+
+                                TableRepeater::make('resource')
+                                    ->label('Table Resource')
+                                    ->default(function (Datamodel $record) {
+                                        $resource = [];
+                                        $schema = $record->schema;
+                                        foreach ($schema as $item) {
+                                            if($item['name'] !== 'id'){
+                                                $resource[] = [
+                                                    'name' => $item['name'],
+                                                    'options' => 'text',
+                                                    'column' => 12,
+                                                ];
+                                            }
+                                        }
+                                        return $resource;
+                                    })
+                                    ->headers([
+                                        Header::make('name')->width('180px'),
+                                        Header::make('options')->width('180px'),
+                                        Header::make('column')->width('180px'),
+                                        Header::make('default')->width('180px'),
+                                    ])
+                                    ->schema([
+                                        TextInput::make('name')
+                                            ->placeholder('Name Relation')
+                                            ->required(),
+                                        Select::make('options')
+                                            ->placeholder('Choose option field')
+                                            ->default('text')
+                                            ->options([
+                                                'none' => 'None',
+                                                'text' => 'Text',
+                                                'select' => 'Select',
+                                                'checkbox' => 'Checkbox',
+                                                'toggle' => 'Toggle',
+                                                'checkbox_list' => 'Checkbox List',
+                                                'radio' => 'Radio',
+                                                'date' => 'Date Picker',
+                                                'datetime' => 'Datetime Picker',
+                                                'time' => 'Time Picker',
+                                                'file' => 'File Upload',
+                                                'rich_text' => 'Rich Text',
+                                                'markerdown_editor' => 'Markdown Editor',
+                                                'repater' => 'Table Repeater',
+                                                'builder' => 'Builder',
+                                                'tags_input' => 'Tags Input',
+                                                'textarea' => 'Textarea',
+                                                'key_value' => 'Key Value',
+                                                'color_picker' => 'Color Picker',
+                                                'toggle_button' => 'Toggle Button',
+                                                'hidden' => 'Hidden',
+
+                                            ])
+                                            ->required(),
+                                        TextInput::make('column')
+                                            ->placeholder('Column')
+                                            ->numeric()
+                                            ->required(),
+                                        TextInput::make('default'),
+                                    ])->columnSpan('full'),
+                            ])
+                        ])
+                        ->action(function (array $data, DataModel $record): void {
+                            $record->resource = $data['resource'];
+                            craete_resource($data, $record);
+                            $record->save();
+                        }),
                 ])
                     ->icon('heroicon-m-ellipsis-horizontal-circle')
                     ->size(ActionSize::Large)

@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\PostResource\Pages;
-use App\Filament\Resources\PostResource;
+namespace App\Filament\Resources\ProductResource\Pages;
+
+use App\Filament\Resources\ProductResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListPosts extends ListRecords
+class ListProducts extends ListRecords
 {
-    protected static string $resource = PostResource::class;
+    protected static string $resource = ProductResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -15,5 +16,4 @@ class ListPosts extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
-    
 }

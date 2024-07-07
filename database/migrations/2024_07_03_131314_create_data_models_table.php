@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('schema');
             $table->text('relations')->nullable();
+            $table->text('resource')->nullable();
             $table->string('trait_ralation_path')->nullable();
             $table->timestamps();
         });

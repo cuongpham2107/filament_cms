@@ -2,6 +2,6 @@
 
 namespace App\Models\Traits;
 
-trait DasdfRelationTrait
+trait TestRelationTrait
 {
 }

@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-use App\Models\Traits\AbcRelationTrait;
+use App\Models\Traits\TestRelationTrait;
 
-class Abc extends Model
+class Test extends Model
 {
-    use HasFactory,AbcRelationTrait;
+    use HasFactory,TestRelationTrait;
 
      /**
      * The attributes that are mass assignable.

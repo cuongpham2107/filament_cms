@@ -7,6 +7,7 @@ use App\Filament\Resources\DataModelResource;
 use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use App\Common\CompareArrayCommon;
 
 class EditDataModel extends EditRecord
 {
@@ -37,63 +38,87 @@ class EditDataModel extends EditRecord
     }
     protected function handleRecordUpdate(\Illuminate\Database\Eloquent\Model $record, array $data): \Illuminate\Database\Eloquent\Model
     {
-        // if($record->name !== $data['name']){
-        //     update_table_name($record->name, $data['name']);
-        // }
-        // dd($this->compareArrays($record->schema, $data['schema']));
-        dd($record->schema, $data['schema']);
+        
+        $databaseManager = DatabaseManager::getInstance();
 
-        if (count($this->compareArrays($record->schema, $data['schema'])) !== 0) {
-
-            // Notification::make()
-            // ->title($message)
-            // ->success()
-            // ->send();
+        $compareArray = CompareArrayCommon::compareArrays($record->schema, $data['schema']);
+        if($record->name !== $data['name']){
+            $result = $databaseManager->renameTable($record->name, $data['name']);
+            if($result['status'] === false){
+                Notification::make()
+                ->title('Table is not Renamed')
+                ->danger()
+                ->body($result['message'])
+                ->send();
+            }else{
+                Notification::make()
+                ->title('Table is Renamed')
+                ->success()
+                ->body($result['message'])
+                ->send();
+            }
         }
-        // $record->update($data);
-        // return $record;
-    }
-
-    function compareArrays($original, $modified)
-    {
-        $changedValues = [];
-        $addedValues = [];
-        $removedValues = [];
-
-        // Check for added or changed values in $modified
-        foreach ($modified as $key => $value) {
-            if (is_array($value)) {
-                if (!isset($original[$key])) {
-                    $addedValues[$key] = $value;
-                } else {
-                    $subChanges = $this->compareArrays($original[$key], $value);
-                    if (!empty($subChanges['changed']) || !empty($subChanges['added']) || !empty($subChanges['removed'])) {
-                        $changedValues[$key] = $subChanges;
-                    }
+        if(isset($compareArray['added']) && count($compareArray['added']) > 0)
+        {
+            foreach($compareArray['added'] as $key => $value){
+                $result = $databaseManager->addColumn($record->name, $value);
+                if($result['status'] === false){
+                    Notification::make()
+                    ->title('Column is not Created')
+                    ->danger()
+                    ->body($result['message'])
+                    ->send();
+                }else{
+                    Notification::make()
+                    ->title('Column is Created')
+                    ->success()
+                    ->body($result['message'])
+                    ->send();
                 }
-            } else {
-                if (!array_key_exists($key, $original) || $original[$key] !== $value) {
-                    $changedValues[$key] = $value;
+            }
+        }
+        else if(isset($compareArray['removed']) && count($compareArray['removed']) > 0)
+        {
+            foreach($compareArray['removed'] as $key => $value){
+                $result = $databaseManager->deleteColumn($record->name, $value);
+                if($result['status'] === false){
+                    Notification::make()
+                    ->title('Column is not Removed')
+                    ->danger()
+                    ->body($result['message'])
+                    ->send();
+                }else{
+                    Notification::make()
+                    ->title('Column is Removed')
+                    ->success()
+                    ->body($result['message'])
+                    ->send();
+                }
+            }
+        }
+        else if(isset($compareArray['updated']) && count($compareArray['updated']) > 0)
+        { 
+            foreach($compareArray['updated'] as $key => $value){
+                $result = $databaseManager->updateColumn($record->name, $value['old'], $value['new']);
+                if($result['status'] === false){
+                    Notification::make()
+                    ->title('Column is not Updated')
+                    ->danger()
+                    ->body($result['message'])
+                    ->send();
+                }else{
+                    Notification::make()
+                    ->title('Column is Updated')
+                    ->success()
+                    ->body($result['message'])
+                    ->send();
                 }
             }
         }
 
-        // Check for removed values in $original
-        foreach ($original as $key => $value) {
-            if (!array_key_exists($key, $modified)) {
-                $removedValues[$key] = $value;
-            }
-        }
 
-        // Kết hợp kết quả
-        $result = [
-            'changed' => $changedValues,
-            'added' => $addedValues,
-            'removed' => $removedValues,
-        ];
 
-        return $result;
+        $record->update($data);
+        return $record;
     }
-
-
 }
