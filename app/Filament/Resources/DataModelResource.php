@@ -14,11 +14,12 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
-use Filament\Resources\Pages\Page;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\ActionSize;
 use Filament\Support\Enums\MaxWidth;
@@ -361,6 +362,7 @@ class DataModelResource extends Resource
                             return "Create Resource ($record->name)";
                         })
                         ->icon('heroicon-m-adjustments-horizontal')
+                        ->modalWidth(MaxWidth::ScreenTwoExtraLarge)
                         ->fillForm(function (DataModel $record): array {
                             $resource = [];
                             $schema = $record->schema;
@@ -368,12 +370,14 @@ class DataModelResource extends Resource
                                 if($item['name'] !== 'id'){
                                     $resource[] = [
                                         'name' => $item['name'],
-                                        'options' => 'none',
-                                        'column' => 1,
+                                        'display' => ['index','view','edit','add','delete'],
+                                        'options' => 'text',
+                                        'label' => $item['name'],
+                                        'default' => null
                                     ];
                                 }
                             }
-                                        
+                            // dd($resource);
                             return [
                                 'resource' => $record->resource ?? $resource,
                             ];
@@ -386,36 +390,49 @@ class DataModelResource extends Resource
 
                                 TableRepeater::make('resource')
                                     ->label('Table Resource')
-                                    ->default(function (Datamodel $record) {
-                                        $resource = [];
-                                        $schema = $record->schema;
-                                        foreach ($schema as $item) {
-                                            if($item['name'] !== 'id'){
-                                                $resource[] = [
-                                                    'name' => $item['name'],
-                                                    'options' => 'text',
-                                                    'column' => 12,
-                                                ];
-                                            }
-                                        }
-                                        return $resource;
-                                    })
+                                    // ->default(function (Datamodel $record) {
+                                    //     $resource = [];
+                                    //     $schema = $record->schema;
+                                       
+                                    //     foreach ($schema as $item) {
+                                    //         if($item['name'] !== 'id'){
+                                    //             $resource[] = [
+                                    //                 'name' => $item['name'],
+                                    //                 'options' => 'text',
+                                    //                 'column' => 12,
+                                    //             ];
+                                    //         }
+                                    //     }
+                                    //     return $resource;
+                                    // })
                                     ->headers([
-                                        Header::make('name')->width('180px'),
-                                        Header::make('options')->width('180px'),
-                                        Header::make('column')->width('180px'),
+                                        Header::make('name')->width('100px'),
+                                        Header::make('display')->label('Hiển thị')->width('180px'),
+                                        Header::make('options')->width('120px'),
+                                        Header::make('label')->label('Tiêu đề')->width('180px'),
                                         Header::make('default')->width('180px'),
-                                    ])
+                                    ])  
                                     ->schema([
                                         TextInput::make('name')
-                                            ->placeholder('Name Relation')
+                                            ->readOnly()
                                             ->required(),
+                                        CheckboxList::make('display')
+                                            ->options([
+                                                'index' => 'Danh sách',
+                                                'view' => 'Xem',
+                                                'edit' => 'Chỉnh sửa',
+                                                'add' => 'Thêm mới',
+                                                'delete' => 'Xóa',
+                                            ]),
                                         Select::make('options')
+                                            ->searchable()
                                             ->placeholder('Choose option field')
                                             ->default('text')
                                             ->options([
                                                 'none' => 'None',
-                                                'text' => 'Text',
+                                                'text' => 'Text Input',
+                                                'interger' => 'Interger',
+                                                'password' => 'Password',
                                                 'select' => 'Select',
                                                 'checkbox' => 'Checkbox',
                                                 'toggle' => 'Toggle',
@@ -438,11 +455,10 @@ class DataModelResource extends Resource
 
                                             ])
                                             ->required(),
-                                        TextInput::make('column')
-                                            ->placeholder('Column')
-                                            ->numeric()
+                                        TextInput::make('label')
+                                            ->autocapitalize('words')
                                             ->required(),
-                                        TextInput::make('default'),
+                                        CodeEditor::make('default'),
                                     ])->columnSpan('full'),
                             ])
                         ])

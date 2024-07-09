@@ -37,20 +37,24 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                Section::make('Product Information')
-                    ->schema([
-                        TextInput::make('name')->columnSpan(6),
-                        TextInput::make('slug')->columnSpan(6),
-                        TextInput::make('price')->columnSpan(4),
-                        FileUpload::make('image')->columnSpan(4),
-                        FileUpload::make('thumbnails')->columnSpan(4),
-                        Textarea::make('description')->columnSpan(12),
-                        TextInput::make('content')->columnSpan(12),
-                        Select::make('status')->columnSpan(3),
-                        Select::make('featured')->columnSpan(3),
-                        TextInput::make('created_at')->columnSpan(3),
-                        TextInput::make('updated_at')->columnSpan(3),
-                    ])->columns(12),
+                  Section::make('Product Information')
+                      ->schema([
+                  TextInput::make('name')->columnSpan(6),
+                  TextInput::make('slug')->columnSpan(6),
+                  Select::make('category_id')
+                      ->columnSpan(6),
+                  TextInput::make('price')->columnSpan(6),
+                  FileUpload::make('image')->columnSpan(6),
+                  FileUpload::make('thumbnails')->columnSpan(6),
+                  Textarea::make('description')->columnSpan(12),
+                  RichEditor::make('content')->columnSpan(12),
+                  Select::make('status')
+                      ->columnSpan(3),
+                  Select::make('featured')
+                      ->columnSpan(3),
+                  DateTimePicker::make('created_at')->columnSpan(3),
+                  DateTimePicker::make('updated_at')->columnSpan(3),
+                      ])->columns(12),
             ]);
     }
     public static function table(Table $table): Table

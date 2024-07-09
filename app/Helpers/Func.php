@@ -90,7 +90,7 @@ if(!function_exists('create_trait_relations')){
 if(!function_exists('craete_resource'))
 {
     function craete_resource($data,$record){
-
+        dd($data['resource']);
         $resource = "<?php\n\n";
         $resource .= "namespace App\Filament\Resources;\n";
         $resource .= "use App\Filament\Resources\\".singularize_and_capitalize_words($record->name)."Resource\Pages;\n";
@@ -137,67 +137,84 @@ if(!function_exists('craete_resource'))
         foreach ($data['resource'] as $field) {
             switch ($field['options']) {
                 case 'text':
-                    $resource .= "                TextInput::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  TextInput::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    break;
+                case 'url':
+                    $resource .= "                  TextInput::make('{$field['name']}')\n";
+                    $resource .= "                      ->url()->suffixIcon('heroicon-m-check-circle')\n";
+                    $resource .= "                      ->suffixIconColor('success')\n";
+                    $resource .= "                      ->columnSpan({$field['column']}),\n";
+                    break;
+                case 'integer':
+                    $resource .= "                  TextInput::make('{$field['name']}')\n";
+                    $resource .= "                      ->numeric()\n";
+                    $resource .= "                      ->columnSpan({$field['column']}),\n";
+                    break;
+                case 'password':
+                    $resource .= "                  TextInput::make('{$field['name']}')\n";
+                    $resource .= "                      ->password()\n";
+                    $resource .= "                      ->columnSpan({$field['column']}),\n";
                     break;
                 case 'select':
-                    $resource .= "                Select::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  Select::make('{$field['name']}')\n";
+                    $resource .= "                      ->columnSpan({$field['column']}),\n";
                     break;
                 case 'checkbox':
-                    $resource .= "                Checkbox::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  Checkbox::make('{$field['name']}')->columnSpan({$field['column']}),\n";
                     break;
                 case 'toggle':
-                    $resource .= "                Toggle::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  Toggle::make('{$field['name']}')->columnSpan({$field['column']}),\n";
                     break;
                 case 'checkbox_list':
-                    $resource .= "                CheckboxList::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  CheckboxList::make('{$field['name']}')->columnSpan({$field['column']}),\n";
                     break;
                 case 'radio':
-                    $resource .= "                Radio::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  Radio::make('{$field['name']}')->columnSpan({$field['column']}),\n";
                     break;
                 case 'date':
-                    $resource .= "                DatePicker::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  DatePicker::make('{$field['name']}')->columnSpan({$field['column']}),\n";
                     break;
                 case 'datetime':
-                    $resource .= "                DateTimePicker::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  DateTimePicker::make('{$field['name']}')->columnSpan({$field['column']}),\n";
                     break;
                 case 'time':
-                    $resource .= "                TimePicker::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  TimePicker::make('{$field['name']}')->columnSpan({$field['column']}),\n";
                     break;
                 case 'file':
-                    $resource .= "                FileUpload::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  FileUpload::make('{$field['name']}')->columnSpan({$field['column']}),\n";
                     break;
                 case 'rich_text':
-                    $resource .= "                RichEditor::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  RichEditor::make('{$field['name']}')->columnSpan({$field['column']}),\n";
                     break;
                 case 'markerdown_editor':
-                    $resource .= "                MarkdownEditor::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  MarkdownEditor::make('{$field['name']}')->columnSpan({$field['column']}),\n";
                     break;
                 case 'repeater':
-                    $resource .= "                Repeater::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  Repeater::make('{$field['name']}')->columnSpan({$field['column']}),\n";
                     break;
                 case 'builder':
-                    $resource .= "                Builder::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  Builder::make('{$field['name']}')->columnSpan({$field['column']}),\n";
                     break;
                 case 'tags_input':
-                    $resource .= "                TagsInput::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  TagsInput::make('{$field['name']}')->columnSpan({$field['column']}),\n";
                     break;
                 case 'textarea':
-                    $resource .= "                Textarea::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  Textarea::make('{$field['name']}')->columnSpan({$field['column']}),\n";
                     break;
                 case 'key_value':
-                    $resource .= "                KeyValue::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  KeyValue::make('{$field['name']}')->columnSpan({$field['column']}),\n";
                     break;
                 case 'color_picker':
-                    $resource .= "                ColorPicker::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  ColorPicker::make('{$field['name']}')->columnSpan({$field['column']}),\n";
                     break;
                 case 'toggle_button':
-                    $resource .= "                ToggleButtons::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  ToggleButtons::make('{$field['name']}')->columnSpan({$field['column']}),\n";
                     break;
                 case 'hidden':
-                    $resource .= "                Hidden::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  Hidden::make('{$field['name']}')->columnSpan({$field['column']}),\n";
                     break;
                 default:
-                    $resource .= "                TextInput::make('{$field['name']}')->columnSpan({$field['column']}),\n";
+                    $resource .= "                  TextInput::make('{$field['name']}')->columnSpan({$field['column']}),\n";
                     break;
             }
         }
